@@ -137,7 +137,6 @@ plot([theta(j) theta(j)],[0 1]);
 else
 plot([0 1],[theta(j) theta(j)]);
 end
-
-
-
 end
+
+

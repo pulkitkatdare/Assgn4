@@ -2,7 +2,10 @@
 clear
 format longe
 load data3
-test_data = dataset(1:1000,:);
+points=randi([1 2000],1000,1);
+test_data = dataset(points(:,1),:);
+check_data1 = [test_data(:,1);test_data(:,2)];
+check_data2 = [ test_data(:,2)] ;
 y_t = zeros(1000,1);
 for k =1:1000
 if(norm(dataset(k,:))<2)
@@ -11,10 +14,10 @@ else
 y_t(k) = -1;
 end
 end
-
 T = 40; 
 epsilon = zeros(T,1) ;
 weights = 10e-4*ones(1000,1);
+weights_check = weights;
 alpha_t = zeros(T,1);
 p = zeros(T,1);
 theta = zeros(T,1);
@@ -24,38 +27,51 @@ delta= zeros(T,1);
 for j = 1:T
 	j
     errmin = 10;
-    err = zeros(1000,2);
-for q = 1:1000
-    for w = 1:2
-    angle = test_data(q,w);
+    %err = zeros(1000,2);
+ %   if(rem(j,2) ==0)
+m = length(check_data1);
+  %  else
+   % m = length(check_data2);
+   % end
+for prod = 1:m
+    angle = check_data1(m);
+    [q,w] = find(test_data==angle);
     %i(j)  = w;
-    ptest = 1 ;
-     pred1 =zeros(1000,1);
+    ptest = -1 ;
+    pred1 =zeros(1000,1); 
+    err = 0 ;
     for e=1:1000
-        if ((ptest*(test_data(e,w)-angle))<=0)
+        if (sign(ptest*(test_data(e,w)-angle))<=0)
         pred1(e) = -1;
         else 
             pred1(e)  =1 ;
         end
-    if (y_t(e)~=pred1(e))
-    err(q,w) = err(q,w) + weights(e);
+    if (y_t(e) ~= pred1(e))
+    err = err + weights(e);
     end
     end
-if (err(q,w) > 0.50)
-err(q,w) = 1-err(q,w);
+if (err > 0.50)
+err = 1-err;
 ptest = -ptest;
 end
-if(err(q,w) < errmin)
-errmin = err(q,w);
+if(err < errmin)
+errmin = err;
 theta(j) = angle;
-i(j) = w;
-pred2 = pred1;
+q_check = q;
+m_check = m;
+i(j) = w(1);
 p(j) = ptest;
+pred2 = pred1;
+end
 end
 
 
-end
-end
+%check_data(q_check*i(j))= 0.5;
+%if (rem(j,2) == 0)
+check_data1 = [check_data1(1:m_check-1,1);check_data1(m_check+1:end,1)];
+%else
+ %   check_data2 = [check_data2(1:m-1,1);check_data2(m+1:end,1)];
+%end
 check = weights;    
 %theta(j) = rand(1);
 %p(j) = 1; 
